@@ -1,0 +1,400 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="../TransferWidget.css" type="text/css" />
+        <link rel="stylesheet" href="codemirror/codemirror.css" type="text/css" />
+        <style>
+            #content{
+                display:inline-flex;
+            }
+            #demos>div:not(.nocenter){
+                margin:1em;
+                text-align:center;
+            }
+            #demos>div>*{
+                margin-left:auto;
+                margin-right:auto;
+            }
+
+            #mytransfer{
+                top:50%;
+            }
+
+            .CodeMirror{
+                margin-left:auto;
+                margin-right: auto;
+                border:groove;
+                width: 50%;
+                text-align:initial;
+            }
+            label{
+                margin-right:5px;
+            }
+
+            #top {
+                position: -webkit-sticky;
+                position:sticky;
+                top: 0;
+                background-color:white;
+                z-index:100000;
+                
+                -webkit-box-shadow: 0px 10px 5px 0px rgba(0,0,0,0.75);
+                -moz-box-shadow: 0px 10px 5px 0px rgba(0,0,0,0.75);
+                box-shadow: 0px 10px 5px 0px rgba(0,0,0,0.75);
+            }
+
+            #navbar > * {
+                margin: 2em;
+                display: inline-flex;
+            }
+        </style>
+        <style id="neon">
+.transferlist.neon {
+    border: 2px groove #00b8ff;
+    background-color: #00ff9f;
+    border-radius: 5px;
+    -webkit-box-shadow: 1px 1px 5px 1px rgba(187,0,255,1);
+    -moz-box-shadow: 1px 1px 5px 1px rgba(187,0,255,1);
+    box-shadow: 1px 1px 5px 1px rgba(187,0,255,1);
+    margin:5px;
+}
+
+
+    .transferlist.neon > li.selected {
+        background-color: #d600ff;
+        color: #00ff9f;
+        border-radius: 3px;
+        -webkit-box-shadow: 1px 1px 5px 1px rgba(187,0,255,1);
+        -moz-box-shadow: 1px 1px 5px 1px rgba(187,0,255,1);
+        box-shadow: 1px 1px 5px 1px rgba(187,0,255,1);
+    }
+
+.transferbutton.neon {
+    background-color:#bd00ff;
+    border-color:aqua;
+}
+        </style>
+    </head>
+    <body>
+        <div id="top">
+            <h1 style="text-align:center;">TransferWidget Demo</h1>
+            <div id="navbar"></div>
+        </div>
+        <div id="content">
+            <div id="demos" style="width:65vw;">
+                <div id="init" class="demo">
+                    <h3>Initialization</h3>
+                    <h5>A new TransferWidget can be initialized by specifying a div with the "transferwidget" class</h5>
+                </div>
+
+                <div id="basic" class="demo">
+                    <h3>Basic Usage</h3>
+                    <h5>Items are moved from one box to the other by selecting them and then clicking the appropriate transfer button.</h5>
+                    <h5>Items can also be moved to the opposite box by double clicking them.</h5>
+                </div>
+
+                <div id="styles" class="demo">
+                    <h3>Style</h3>
+                    <h5>TransferWidgets can be initialized with classes for transferelement and listelement by assigning those properties of the option object</h5>
+                    <h5>Classes can also be changed using the TW.updateStyle(element, classname) method.</h5>
+
+                    <select id="styleselect">
+                        <option value="">No Class</option>
+                        <option value="neon">Neon</option>
+                    </select>
+
+                </div>
+
+                <div id="event" class="demo">
+                    <h3>Event Listeners</h3>
+                    <h5>TransferWidget.addEventListener("additem") can be used to signal when an item is added.</h5>
+                    <h4>
+                        Most Recent Added: <span id="recentadded"></span>
+                    </h4>
+                    <h5>TransferWidget.addEventListener("selectitem") can be used to signal when an item has been selected.</h5>
+                    <h4>
+                        Most Recent Selected: <span id="recentselected"></span>
+                    </h4>
+                    <h5>TransferWidget.addEventListener("moveitem") can be used to signal when an item has moved.</h5>
+                    <h4>
+                        Most Recent Moved: <span id="recentmoved"></span>
+                    </h4>
+                </div>
+
+                <div id="additem" class="demo">
+                    <h3>addItem Method</h3>
+                    <h5>TransferWidget.addItem(list, value[, text=value]) can be used to add another item to a list</h5>
+                    <div style="display:inline-flex;">
+                        <label>List: <select id="ailist"><option value="0" selected>1</option><option value="1">2</option></select></label>
+                        <label>Text: <input id="aitext" type="text" /></label>
+                        <label>Value: <input id="aivalue" type="text" /></label>
+                        <input type="button" onclick="addItem();" value="Add Item" />
+                    </div>
+                </div>
+
+                <div id="addmultiple" class="demo">
+                    <h3>AddMultiple Method</h3>
+                    <h5>TransferWidget.addMultiple(items) takes a list of items (per TW.addItem) and adds them using TW.addItem</h5>
+
+                    <span style="display:block;padding-top:3px;font-style:italic;">Define a new item on each line, formatted as: [listnumber(0 or 1)] [Item Value] [Item Name]</span>
+                    <textarea id="addMultiText" style="display:block;height:10em;width:25em;"></textarea>
+                    <input type="button" onclick="addMultiple();" value="Add Multiple" />
+                </div>
+
+                <div id="getlists" class="demo">
+                    <h3>getLists Method</h3>
+                    <h5>TransferWidget.getLists([listnumber=undefined]) can be used to retrieve the [text, value] currently in each list</h5>
+                    <button type="button" onclick="printOutput();" style="display:block;">
+                        Print Lists
+                    </button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>List 1</th>
+                                <th>List 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="output"></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="removeitem" class="demo">
+                    <h3>removeItem Method</h3>
+                    <h5>TransferWidget.removeItem(value) removes the item with the given value from either list </h5>
+                    <label>Value to Remove: <input type="text" id="removeValue" /></label>
+                    <input type="button" onclick="removeItem();" value="Remove" />
+                </div>
+
+            </div>
+            <div style="width:25vw; height:100vh;">
+                <div id="widget" style="position:fixed;left:75vw;top:50vh;">
+                    <div id="mytransfer" class="transferwidget"></div>
+                </div>
+            </div>
+        </div>
+
+        <script src="codemirror/codemirror.js"></script>
+        <script src="codemirror/mode/javascript.js"></script>
+        <script type="text/javascript" src="../TransferWidget.js"></script>
+
+        <!-- DEMO CODE -->
+        <script id="initcode">
+            var TW;
+
+            // list1 is the left-hand box on wider screens, or the top box on small screens
+            // list1 and list2 can contain strings, or 2-length Arrays of string.
+            // If the value in a list is a String, that will be both the value and text of the option
+            // If the value is an Array, then it should be in the format [text, value]
+            let list1 = ["MyVal", ["Your Value", "YourVal"]];
+
+            // new TransferWidgets are created by specifying a div with the transferwidget
+            // class and any additional options desired
+            TW = new TransferWidget(document.getElementById("mytransfer"), { list1: list1 });
+        </script>
+
+        <script id="stylescode">
+            let select = document.getElementById("styleselect");
+            select.addEventListener("change", updateStyle);
+
+            function updateStyle() {
+                let stylename = select.options[select.selectedIndex].value;
+
+                // TransferWidget.updateStyle(element, className) removes the currently set
+                // style from the given element and applies the provided className
+                // element should be either "list" or "button"
+                TW.updateStyle("list", stylename)
+                TW.updateStyle("button", stylename)
+            }
+        </script>
+
+        <script>
+            document.getElementById("stylescode").innerHTML += `
+/* Neon Style CSS Definition:
+${document.getElementById("neon").innerHTML}
+*/`;
+        </script>
+
+        <script id="eventcode">
+            let added = document.getElementById("recentadded");
+            let selected = document.getElementById("recentselected");
+            let moved = document.getElementById("recentmoved");
+
+            // additem is a CustomEvent emitted by the TransferWidget when an item is added to the boxes
+            // The CustomEvent's detail property contains a single property called item,
+            // which is the option that was added
+            // addMultipleItems will fire an additem Event for each item
+            TW.addEventListener("additem", (e) => added.innerText = `${e.detail.item.innerText} (${e.detail.item.dataset.value})`);
+
+            // selectitem is a CustomEvent emitted by the TransferWidget when an item is clicked (selected)
+            // The CustomEvent's detail property contains a single property called item,
+            // which is the option that was added
+            TW.addEventListener("selectitem", (e) => selected.innerText = `${e.detail.item.innerText} (${e.detail.item.dataset.value})`);
+
+            // moveitem is a CustomEvent emitted by the TransferWidget when an item changes boxes
+            // The CustomEvent's detail property contains three properties: from, to, and item
+            // from is the origin list, to is the destination list, and item is the option that was transfered
+            TW.addEventListener("moveitem", (e) => moved.innerText = `${e.detail.item.innerText} (${e.detail.item.dataset.value})`);
+        </script>
+
+        <script id="additemcode">
+            function strip(str) {
+                return str.replace(/^\s*|\s*$/, "")
+            }
+
+            let [ailist, aitext, aivalue] = [document.getElementById("ailist"),
+            document.getElementById("aitext"),
+            document.getElementById("aivalue")];
+
+            // Exmaple of adding a new item
+            function addItem() {
+                let [list, text, value] = [ailist.options[ailist.selectedIndex].value, aitext.value, aivalue.value];
+                // Removing trailing and leading whitespace
+                text = strip(text);
+                value = strip(value);
+
+                // TransferWidget.addItem takes 2 required arguments and 1 optional:
+                // The first argument is the list and should be either 0 or 1 (corresponding to the
+                // Left/Top list and Right/Bottom list respectively)
+                // The second argument is the
+                try {
+                    TW.addItem(parseInt(list), text, value);
+                } catch (e) {
+                    alert(e)
+                }
+
+                aitext.value = null;
+                aivalue.value = null;
+            }
+        </script>
+
+        <script id="addmultiplecode">
+            let inputitems = document.getElementById("addMultiText");
+
+            // Example of using addMultiple
+            function addMultiple() {
+                //Getting Input
+                let reg = /^\s*(?<list>\d)\s+(?<text>\w+)(?:[^\n\r\w]+(?<value>.+))?$/gm
+
+                let match;
+                let input = [];
+                while ((match = reg.exec(inputitems.value)) !== null) {
+                    try { input.push({ list: parseInt(match.groups.list), text: match.groups.text, value: match.groups.value }); }
+                    catch (err) { 1; };
+                };
+
+                // TransferWidget.AddMultiple takes an Array of objects with properties "list", "text", and "value"
+                // These properties are passed to TW.addItem
+                TW.addMultiple(input);
+
+                inputitems.value = "";
+            }
+        </script>
+
+        <script id="getlistscode">
+            let output = document.getElementById("output")
+
+            // Callback function for Print Lists button
+            function printOutput() {
+                // Clearing previous output
+                while (output.lastChild) {
+                    output.removeChild(output.lastChild);
+                }
+
+                // Output formatting
+                function makeList(values) {
+                    let lines = [];
+                    for (let [text, value] of values) {
+                        lines.push(`<li>${text} (${value})</li>`);
+                    }
+                    lines = lines.join("");
+                    return `<td><ul>${lines}</ul><tr></td>`;
+                }
+
+                // TransferWidget.getLists without an argument returns a length-2 Array
+                // The Array contains sub Arrays, one for each list. Each list's sub
+                // Array contains arrays of [text, value] for each option in that list
+                let lists = TW.getLists()
+
+                for (let values of lists) {
+                    output.insertAdjacentHTML('beforeend', makeList(values));
+                }
+            }
+        </script>
+
+        <script id="removeitemcode">
+            let remove = document.getElementById("removeValue");
+
+            function removeItem() {
+                let value = remove.value;
+
+                // TransferWidget.removeItem removes the item with the given value
+                // from either list. If mutliple items have the same value, this
+                // method will fail to remove any items.
+                TW.removeItem(value);
+            }
+        </script>
+
+        <!-- PAGE UTILITIES -->
+        <script>
+            // Setup Code Display on page
+
+            /**
+             * Adds the Code Section to the Demo Div
+             * @param {Element} demo - Demo div to setup
+             */
+            function addCodeSample(demo) {
+                demo.insertAdjacentHTML("beforeend", `
+                                    <button type="button" onclick="toggleCode(this);" style="display:block;margin-top:5px;">Show Code</button>
+                                    <div>
+                                        <textarea id="${demo.id}codearea"></textarea>
+                                    </div>`);
+            }
+
+            /**
+             * Initializes the code section via CodeMirror
+             * @param {Element} demo - Demo div to setup
+             */
+            function createCodeMirror(demo) {
+                let codearea = document.getElementById(`${demo.id}codearea`);
+                let code = document.getElementById(`${demo.id}code`);
+
+                if (code) { codearea.value = code.innerText; }
+                else { codearea.value = "// No code supplied for this demo" };
+
+                CodeMirror.fromTextArea(codearea, { readOnly: true });
+                return codearea
+            }
+
+            /**
+             * Callback for the code spoilers automatically generated by addCodeSample
+             * @param {Element} button - The spoiler button that was pushed
+             */
+            function toggleCode(button) {
+                let code = button.nextElementSibling;
+                let display = "block";
+                if (code.style.display === "block") {
+                    display = "none";
+                }
+                code.style.display = display;
+            }
+
+            for (let demo of document.getElementsByClassName("demo")) {
+                addCodeSample(demo);
+                let codearea = createCodeMirror(demo);
+                codearea.parentElement.style.display = "none";
+            }
+        </script>
+
+        <script>
+            // Setup Navbar and HR's
+            let navbar = document.getElementById("navbar");
+            let demos = Array.from(document.getElementsByClassName("demo"));
+            for (let [i, demo] of demos.entries()) {
+                let name = demo.querySelector("h3").innerText;
+                navbar.insertAdjacentHTML("beforeend", `<a href="#${demo.id}">${name}</a>`)
+                if (i < demos.length - 1) demo.insertAdjacentHTML("afterend", `<hr />`);
+            }
+        </script>
+    </body>
+</html>
